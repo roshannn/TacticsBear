@@ -25,14 +25,30 @@ public class GridBlock : MonoBehaviour
     }
     public void ObstacleFunctionality(GameObject obs)
     {
+        Debug.Log("3");
         if (!presenceDetected)
         {
-            CreateObstacle(obs);
-            ClearObstacle();
+            if (!obstaclePresent)
+            {
+                var obstacle = GameObject.Instantiate(obs, this.transform);
+                var desiredPos = this.transform.position;
+                desiredPos.y = 1;
+                obstacle.transform.position = desiredPos;
+                obstaclePresent = true;
+            }
+            else if (obstaclePresent)
+            {
+                ClearObstacle();
+                obstaclePresent = false;
+            }
+            else
+            {
+                Debug.Log("ObstaclePresent");
+            }
         }
         else
         {
-            Debug.Log("Someoneis there cant create obstacle");
+            Debug.Log("Someone is there cant create obstacle");
         }
 
     }

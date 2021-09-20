@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 public class ObstacleManager : MonoBehaviour
 {
-    
     public MapBehaviour mapBehaviour;
     public Obstacle obstacleSO;
     public GameObject[,] gridArray;
     public void Awake()
     {
-        gridArray = mapBehaviour.gridArray;
+        //gridArray = mapBehaviour.gridArray;
     }
-    public void ObstacleFunctionality(GridBlock gridBlock)
+    public void ObstacleFunctionality(int i, int j)
+
     {
-        gridBlock.ObstacleFunctionality(obstacleSO.obstacle);
+        if (mapBehaviour.gridArray[i, j].GetComponent<GridBlock>() != null)
+        {
+            mapBehaviour.gridArray[i, j].GetComponent<GridBlock>().ObstacleFunctionality(obstacleSO.obstacle);
+        }
+        
     }
 
     public void ClearAllObstacles()
@@ -22,7 +26,7 @@ public class ObstacleManager : MonoBehaviour
         {
             for(int j = 0;j< mapBehaviour.rows; j++)
             {
-                gridArray[i, j].GetComponent<GridBlock>().ClearObstacle();
+                mapBehaviour.gridArray[i, j].GetComponent<GridBlock>().ClearObstacle();
             }
         }
     }
