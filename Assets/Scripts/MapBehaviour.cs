@@ -10,7 +10,7 @@ public class MapBehaviour : MonoBehaviour
 
     //prefabs
     public PlayerController player;
-    public GameObject gridBlock;
+    public GridBlock gridBlock;
     public EnemyController enemy;
 
     //find path
@@ -29,11 +29,11 @@ public class MapBehaviour : MonoBehaviour
     
     //Grid first block pos
     public Vector3 leftBottomLocation = new Vector3(0, 0, 0);
-    public GameObject[,] gridArray;
+    public GridBlock[,] gridArray;
 
     //Path to follow
-    public List<GameObject> path = new List<GameObject>();
-    public List<GameObject> enemyPath = new List<GameObject>();
+    public List<GridBlock> path = new List<GridBlock>();
+    public List<GridBlock> enemyPath = new List<GridBlock>();
     //Start Location
     public int playerX = 0;
     public int playerY = 0;
@@ -75,7 +75,7 @@ public class MapBehaviour : MonoBehaviour
 
     private void GridInitialization()
     {
-        gridArray = new GameObject[columns, rows];
+        gridArray = new GridBlock[columns, rows];
         if (gridBlock)
         {
             GenerateGrid();
@@ -92,10 +92,10 @@ public class MapBehaviour : MonoBehaviour
         {
             for (int j = 0; j < rows; j++)
             {
-                GameObject obj = Instantiate(gridBlock, new Vector3((leftBottomLocation.x + scale) * i, leftBottomLocation.y, (leftBottomLocation.z + scale) * j), Quaternion.identity);
+                GridBlock obj = Instantiate<GridBlock>(gridBlock, new Vector3((leftBottomLocation.x + scale) * i, leftBottomLocation.y, (leftBottomLocation.z + scale) * j), Quaternion.identity);
                 obj.transform.SetParent(gameObject.transform);
-                obj.GetComponent<GridBlock>().x = i;
-                obj.GetComponent<GridBlock>().y = j;
+                obj.x = i;
+                obj.y = j;
                 obj.gameObject.name = "GridBlock" + num.ToString();
                 num++;
                 gridArray[i, j] = obj;
@@ -109,7 +109,7 @@ public class MapBehaviour : MonoBehaviour
         player = GameObject.Instantiate<PlayerController>(player, new Vector3(gridArray[playerX, playerY].transform.position.x, gridArray[playerX, playerY].transform.position.y + 1, gridArray[playerX, playerY].transform.position.z), Quaternion.identity);
         player.mapBehaviour = this;
         player.boxPos = boxPos;
-        gridArray[playerX, playerY].GetComponent<GridBlock>().presenceDetected = true;
+        gridArray[playerX, playerY].presenceDetected = true;
         //player.transform.SetParent(this.gameObject.transform);
     }
     private void EnemyInitialization()
@@ -133,10 +133,10 @@ public class MapBehaviour : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         yield return null;
-        gridArray[playerX, playerY].GetComponent<GridBlock>().presenceDetected = false;
-        playerX = path[0].GetComponent<GridBlock>().x;
-        playerY = path[0].GetComponent<GridBlock>().y;
-        gridArray[playerX, playerY].GetComponent<GridBlock>().presenceDetected = true;
+        gridArray[playerX, playerY].presenceDetected = false;
+        playerX = path[0].x;
+        playerY = path[0].y;
+        gridArray[playerX, playerY].presenceDetected = true;
         Debug.Log("end of coroutine");
         findEnemyDistance = true;
         yield return null;
@@ -152,31 +152,30 @@ public class MapBehaviour : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         yield return null;
-        gridArray[enemyX, enemyY].GetComponent<GridBlock>().presenceDetected = false;
-        enemyX = enemyPath[1].GetComponent<GridBlock>().x;
-        enemyY = enemyPath[1].GetComponent<GridBlock>().y;
+        gridArray[enemyX, enemyY].presenceDetected = false;
+        enemyX = enemyPath[1].x;
+        enemyY = enemyPath[1].y;
         yield return null;
 
     }
     private void InitialSetup()
     {
-        foreach (GameObject obj in gridArray)
+        foreach (GridBlock obj in gridArray)
         {
-            obj.GetComponent<GridBlock>().visited = -1;
+            obj.visited = -1;
         }
-        gridArray[playerX, playerY].GetComponent<GridBlock>().visited = 0;
-        gridArray[enemyX, enemyY].GetComponent<GridBlock>().visited = -1;
-        //gridArray[enemyX, enemyY].GetComponent<GridBlock>().playerReached = true;
+        gridArray[playerX, playerY].visited = 0;
+        gridArray[enemyX, enemyY].visited = -1;
+        //gridArray[enemyX, enemyY].playerReached = true;
     }
     private void InitialSetupEnemy()
     {
-        foreach (GameObject obj in gridArray)
+        foreach (GridBlock obj in gridArray)
         {
-            obj.GetComponent<GridBlock>().visited = -1;
+            obj.visited = -1;
         }
-        //gridArray[playerX, playerY].GetComponent<GridBlock>().visited = 0;
-        gridArray[enemyX, enemyY].GetComponent<GridBlock>().visited = 0;
-        gridArray[enemyX, enemyY].GetComponent<GridBlock>().presenceDetected = true;
+        gridArray[enemyX, enemyY].visited = 0;
+        gridArray[enemyX, enemyY].presenceDetected = true;
     }
 
     void SetDistance()
@@ -186,9 +185,8 @@ public class MapBehaviour : MonoBehaviour
         int[] testArray = new int[rows * columns];
         for (int step = 1; step < rows * columns; step++)
         {
-            foreach (GameObject obj in gridArray)
+            foreach (GridBlock block in gridArray)
             {
-                var block = obj.GetComponent<GridBlock>();
                 if (block.visited == step - 1)
                 {
                     TestFourDirections(block.x, block.y, step);
@@ -203,12 +201,12 @@ public class MapBehaviour : MonoBehaviour
         int step;
         int x = endX;
         int y = endY;
-        List<GameObject> tempList = new List<GameObject>();
+        List<GridBlock> tempList = new List<GridBlock>();
         path.Clear();
-        if (gridArray[endX, endY] && gridArray[endX, endY].GetComponent<GridBlock>().visited > 0)
+        if (gridArray[endX, endY] && gridArray[endX, endY].visited > 0)
         {
             path.Add(gridArray[x, y]);
-            step = gridArray[x, y].GetComponent<GridBlock>().visited - 1;
+            step = gridArray[x, y].visited - 1;
         }
         else
         {
@@ -233,12 +231,12 @@ public class MapBehaviour : MonoBehaviour
             {
                 tempList.Add(gridArray[x - 1, y]);
             }
-            GameObject tempObj = FindClosest(gridArray[endX, endY].transform, tempList);
+            GridBlock tempObj = FindClosest(gridArray[endX, endY].transform, tempList);
             path.Add(tempObj);
-            x = tempObj.GetComponent<GridBlock>().x;
-            y = tempObj.GetComponent<GridBlock>().y;
+            x = tempObj.x;
+            y = tempObj.y;
             tempList.Clear();
-
+            tempList = null;
         }
     }
 
@@ -249,9 +247,8 @@ public class MapBehaviour : MonoBehaviour
         int[] testArray = new int[rows * columns];
         for (int step = 1; step < rows * columns; step++)
         {
-            foreach (GameObject obj in gridArray)
+            foreach (GridBlock block in gridArray)
             {
-                var block = obj.GetComponent<GridBlock>();
                 if (block.visited == step - 1)
                 {
                     TestFourDirections(block.x, block.y, step);
@@ -264,12 +261,12 @@ public class MapBehaviour : MonoBehaviour
         int step;
         int x = playerX;
         int y = playerY;
-        List<GameObject> tempList = new List<GameObject>();
+        List<GridBlock> tempList = new List<GridBlock>();
         enemyPath.Clear();
-        if (gridArray[playerX, playerY] && gridArray[playerX, playerY].GetComponent<GridBlock>().visited > 0)
+        if (gridArray[playerX, playerY] && gridArray[playerX, playerY].visited > 0)
         {
             enemyPath.Add(gridArray[x, y]);
-            step = gridArray[x, y].GetComponent<GridBlock>().visited - 1;
+            step = gridArray[x, y].visited - 1;
         }
         else
         {
@@ -294,12 +291,12 @@ public class MapBehaviour : MonoBehaviour
             {
                 tempList.Add(gridArray[x - 1, y]);
             }
-            GameObject tempObj = FindClosest(gridArray[playerX, playerY].transform, tempList);
+            GridBlock tempObj = FindClosest(gridArray[playerX, playerY].transform, tempList);
             enemyPath.Add(tempObj);
-            x = tempObj.GetComponent<GridBlock>().x;
-            y = tempObj.GetComponent<GridBlock>().y;
+            x = tempObj.x;
+            y = tempObj.y;
             tempList.Clear();
-
+            tempList = null;
         }
     }
 
@@ -308,7 +305,7 @@ public class MapBehaviour : MonoBehaviour
         switch (direction)
         {
             case Direction.Up:
-                if (y + 1 < rows && gridArray[x, y + 1] && gridArray[x, y + 1].GetComponent<GridBlock>().visited == step && gridArray[x, y + 1].GetComponent<GridBlock>().obstaclePresent ==false)
+                if (y + 1 < rows && gridArray[x, y + 1] && gridArray[x, y + 1].visited == step && gridArray[x, y + 1].obstaclePresent ==false)
                 {
                     return true;
                 }
@@ -317,7 +314,7 @@ public class MapBehaviour : MonoBehaviour
                     return false;
                 }
             case Direction.Right:
-                if (x + 1 < columns && gridArray[x + 1, y] && gridArray[x + 1, y].GetComponent<GridBlock>().visited == step && !gridArray[x + 1, y].GetComponent<GridBlock>().obstaclePresent)
+                if (x + 1 < columns && gridArray[x + 1, y] && gridArray[x + 1, y].visited == step && !gridArray[x + 1, y].obstaclePresent)
                 {
                     return true;
                 }
@@ -326,7 +323,7 @@ public class MapBehaviour : MonoBehaviour
                     return false;
                 }
             case Direction.Down:
-                if (y - 1 > -1 && gridArray[x, y - 1] && gridArray[x, y - 1].GetComponent<GridBlock>().visited == step && !gridArray[x, y - 1].GetComponent<GridBlock>().obstaclePresent)
+                if (y - 1 > -1 && gridArray[x, y - 1] && gridArray[x, y - 1].visited == step && !gridArray[x, y - 1].obstaclePresent)
                 {
                     return true;
                 }
@@ -335,7 +332,7 @@ public class MapBehaviour : MonoBehaviour
                     return false;
                 }
             case Direction.Left:
-                if (x - 1 > -1 && gridArray[x - 1, y] && gridArray[x - 1, y].GetComponent<GridBlock>().visited == step && !gridArray[x - 1, y].GetComponent<GridBlock>().obstaclePresent)
+                if (x - 1 > -1 && gridArray[x - 1, y] && gridArray[x - 1, y].visited == step && !gridArray[x - 1, y].obstaclePresent)
                 {
                     return true;
                 }
@@ -370,11 +367,11 @@ public class MapBehaviour : MonoBehaviour
     {
         if (gridArray[x, y])
         {
-            gridArray[x, y].GetComponent<GridBlock>().visited = step; 
+            gridArray[x, y].visited = step; 
         }
     }
 
-    GameObject FindClosest(Transform targetLoc,List<GameObject> list)
+    GridBlock FindClosest(Transform targetLoc,List<GridBlock> list)
     {
         float currentDistance = scale * rows * columns;
         int indexNumber = 0;

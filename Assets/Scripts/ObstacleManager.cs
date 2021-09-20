@@ -5,17 +5,16 @@ public class ObstacleManager : MonoBehaviour
 {
     public MapBehaviour mapBehaviour;
     public Obstacle obstacleSO;
-    public GameObject[,] gridArray;
     public void Awake()
     {
-        //gridArray = mapBehaviour.gridArray;
+
     }
     public void ObstacleFunctionality(int i, int j)
 
     {
-        if (mapBehaviour.gridArray[i, j].GetComponent<GridBlock>() != null)
+        if (mapBehaviour.gridArray[i, j] != null)
         {
-            mapBehaviour.gridArray[i, j].GetComponent<GridBlock>().ObstacleFunctionality(obstacleSO.obstacle);
+            mapBehaviour.gridArray[i, j].ObstacleFunctionality(obstacleSO.obstacle);
         }
         
     }
@@ -26,7 +25,7 @@ public class ObstacleManager : MonoBehaviour
         {
             for(int j = 0;j< mapBehaviour.rows; j++)
             {
-                mapBehaviour.gridArray[i, j].GetComponent<GridBlock>().ClearObstacle();
+                mapBehaviour.gridArray[i, j].ClearObstacle();
             }
         }
     }

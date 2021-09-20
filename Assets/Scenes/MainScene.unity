@@ -655,7 +655,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boxPos: {fileID: 926520738}
   player: {fileID: 3850422781618596939, guid: 79293625f1f668243bf25487b031811d, type: 3}
-  gridBlock: {fileID: 3003670430198303070, guid: 5c65ebbcb5470e04eae29c90d8a52c72,
+  gridBlock: {fileID: 8536751943452283975, guid: 5c65ebbcb5470e04eae29c90d8a52c72,
     type: 3}
   enemy: {fileID: -3581436711628066391, guid: 97818332aad1f0348b75f3c6e03c09e5, type: 3}
   findDistance: 0

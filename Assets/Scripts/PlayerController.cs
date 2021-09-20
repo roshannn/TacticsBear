@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void MovePlayer(List<GameObject> path,int i)
+    public void MovePlayer(List<GridBlock> path,int i)
     {
         var nextPos = new Vector3(path[i].transform.position.x, 1, path[i].transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position,nextPos, moveSpeed);
